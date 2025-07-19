@@ -234,12 +234,101 @@ session_start();
                     return;
                 }
                 
+                // Show progress container and disable form
                 progressContainer.style.display = 'block';
                 migrationBtn.disabled = true;
                 migrationBtn.innerHTML = '⏳ Migrando...';
+                testBtn.disabled = true;
                 
-                // Here we would handle the actual migration
-                // For now, just show the progress container
+                // Reset progress
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+                const migrationLog = document.getElementById('migrationLog');
+                
+                progressFill.style.width = '0%';
+                progressText.textContent = 'Iniciando migración...';
+                migrationLog.innerHTML = '';
+                
+                // Prepare form data
+                const formData = new FormData(form);
+                
+                // Start migration
+                fetch('migrate.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Migration completed successfully
+                        progressFill.style.width = '100%';
+                        progressText.textContent = '✅ ¡Migración completada exitosamente!';
+                        migrationLog.innerHTML = `
+                            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                                <strong>✅ Migración exitosa</strong><br>
+                                ${data.message.replace(/\n/g, '<br>')}
+                            </div>
+                        `;
+                        
+                        // Show detailed results if available
+                        if (data.details) {
+                            migrationLog.innerHTML += `
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px; font-size: 0.9em;">
+                                    <strong>📊 Detalles de migración:</strong><br>
+                                    • Total de carpetas: ${data.details.total_mailboxes}<br>
+                                    • Carpetas procesadas: ${data.details.processed_mailboxes}<br>
+                                    • Mensajes totales: ${data.details.total_messages}<br>
+                                    • Mensajes migrados: ${data.details.migrated_messages}<br>
+                                    • Errores: ${data.details.error_count}
+                                </div>
+                            `;
+                        }
+                        
+                    } else {
+                        // Migration failed or completed with errors
+                        progressFill.style.width = '100%';
+                        progressFill.style.background = '#dc3545';
+                        progressText.textContent = '❌ Error en migración';
+                        migrationLog.innerHTML = `
+                            <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                                <strong>❌ Error en migración</strong><br>
+                                ${data.message.replace(/\n/g, '<br>')}
+                            </div>
+                        `;
+                        
+                        // Show detailed error results if available
+                        if (data.details) {
+                            migrationLog.innerHTML += `
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px; font-size: 0.9em;">
+                                    <strong>📊 Resumen de intentos:</strong><br>
+                                    • Total de carpetas: ${data.details.total_mailboxes}<br>
+                                    • Carpetas exitosas: ${data.details.successful_mailboxes}<br>
+                                    • Carpetas fallidas: ${data.details.failed_mailboxes}<br>
+                                    • Mensajes migrados: ${data.details.migrated_messages}<br>
+                                    • Errores totales: ${data.details.error_count}
+                                </div>
+                            `;
+                        }
+                    }
+                })
+                .catch(error => {
+                    // Network or parsing error
+                    progressFill.style.width = '100%';
+                    progressFill.style.background = '#dc3545';
+                    progressText.textContent = '❌ Error de conexión';
+                    migrationLog.innerHTML = `
+                        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                            <strong>❌ Error de conexión</strong><br>
+                            ${error.message}
+                        </div>
+                    `;
+                })
+                .finally(() => {
+                    // Re-enable buttons
+                    migrationBtn.disabled = false;
+                    migrationBtn.innerHTML = '🚀 Iniciar Migración';
+                    testBtn.disabled = false;
+                });
             });
             
             // Auto-adjust port based on SSL checkbox
