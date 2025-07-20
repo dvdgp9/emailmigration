@@ -15,6 +15,7 @@
     <p>Este test hace exactamente la misma llamada AJAX que la interfaz web.</p>
     
     <button onclick="testMigration()">🚀 Probar migrate.php</button>
+    <button onclick="testMigrationDebug()" style="margin-left: 10px;">🔍 Probar migrate_debug.php (con errores)</button>
     
     <div id="results"></div>
     
@@ -102,6 +103,78 @@
         })
         .catch(e => {
             document.getElementById('results').innerHTML += `<div class="result error">❌ Error verificando log: ${e.message}</div>`;
+        });
+    }
+    
+    function testMigrationDebug() {
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '<div class="result">⏳ Probando migrate_debug.php (con errores habilitados)...</div>';
+        
+        // Crear FormData exactamente como lo hace index.php
+        const formData = new FormData();
+        formData.append('source_host', 'ebonemx.plesk.trevenque.es');
+        formData.append('source_port', '993');
+        formData.append('source_ssl', 'on');
+        formData.append('source_username', 'testorigen@ebone.es');
+        formData.append('source_password', '6Z7h3^h5o');
+        formData.append('dest_host', 'ebonemx.plesk.trevenque.es');
+        formData.append('dest_port', '993');
+        formData.append('dest_ssl', 'on');  
+        formData.append('dest_username', 'test@ebone.es');
+        formData.append('dest_password', 'za*4e768D');
+        formData.append('preserve_flags', 'on');
+        formData.append('preserve_structure', 'on');
+        formData.append('batch_size', '5');
+        
+        const startTime = Date.now();
+        
+        // Hacer fetch a migrate_debug.php
+        fetch('migrate_debug.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            const endTime = Date.now();
+            const duration = endTime - startTime;
+            
+            resultsDiv.innerHTML += `<div class="result">⏱️ Tiempo de respuesta: ${duration}ms</div>`;
+            resultsDiv.innerHTML += `<div class="result">📡 Status HTTP: ${response.status} ${response.statusText}</div>`;
+            resultsDiv.innerHTML += `<div class="result">📤 Content-Type: ${response.headers.get('content-type')}</div>`;
+            
+            // Intentar obtener texto de la respuesta
+            return response.text();
+        })
+        .then(responseText => {
+            resultsDiv.innerHTML += `<div class="result">📏 Longitud respuesta: ${responseText.length} bytes</div>`;
+            
+            if (responseText.length > 0) {
+                resultsDiv.innerHTML += `<div class="result success">✅ migrate_debug.php SÍ responde</div>`;
+                resultsDiv.innerHTML += `<div class="result">📄 Respuesta RAW completa:<br>${responseText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`;
+                
+                // Intentar parsear JSON (buscar la parte JSON al final)
+                const jsonMatch = responseText.match(/\{.*\}$/s);
+                if (jsonMatch) {
+                    try {
+                        const jsonData = JSON.parse(jsonMatch[0]);
+                        resultsDiv.innerHTML += `<div class="result success">✅ JSON VÁLIDO encontrado</div>`;
+                        resultsDiv.innerHTML += `<div class="result">success: ${jsonData.success}</div>`;
+                        resultsDiv.innerHTML += `<div class="result">message: ${jsonData.message || 'N/A'}</div>`;
+                    } catch (e) {
+                        resultsDiv.innerHTML += `<div class="result error">❌ JSON INVÁLIDO: ${e.message}</div>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML += `<div class="result error">❌ No se encontró JSON en la respuesta</div>`;
+                }
+            } else {
+                resultsDiv.innerHTML += `<div class="result error">❌ migrate_debug.php devuelve respuesta VACÍA</div>`;
+            }
+        })
+        .catch(error => {
+            const endTime = Date.now();
+            const duration = endTime - startTime;
+            
+            resultsDiv.innerHTML += `<div class="result error">❌ ERROR de red/timeout después de ${duration}ms</div>`;
+            resultsDiv.innerHTML += `<div class="result error">Error: ${error.message}</div>`;
         });
     }
     </script>
