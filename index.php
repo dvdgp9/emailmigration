@@ -152,9 +152,14 @@ session_start();
                     </div>
                     
                     <div class="form-group">
-                        <label for="batch_size">Emails por lote (menor = más seguro)</label>
+                        <label for="batch_size">Emails por lote (batch size)</label>
                         <input type="number" id="batch_size" name="batch_size" class="form-control" 
-                               value="2" min="1" max="200">
+                               value="50" min="1" max="200">
+                        <small style="color: #666; font-size: 12px;">
+                            Procesa emails en lotes de este tamaño con pausas entre lotes.<br>
+                            Ejemplo: 500 emails con batch=50 → 10 lotes de 50 emails cada uno.<br>
+                            <strong>Menor valor = más seguro</strong> (especialmente para emails con adjuntos grandes)
+                        </small>
                     </div>
                 </div>
 

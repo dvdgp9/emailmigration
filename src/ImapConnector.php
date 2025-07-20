@@ -221,105 +221,106 @@ class ImapConnector
             $migratedCount = 0;
             $errorCount = 0;
             
-            // Process all messages up to batch size limit
-            $maxMessages = min($batchSize, $totalMessages);
+            // Process all messages using batch processing
             $processedCount = 0;
+            $currentBatch = 0;
             
-            foreach ($messages as $message) {
-                if ($processedCount >= $maxMessages) {
-                    break; // Stop after processing maxMessages
-                }
-                try {
-                    // Get full message content
-                    $rawMessage = $message->getRawMessage();
-                    
-                    // Get message date safely
+            // Convert messages to array for batch processing
+            $messagesArray = iterator_to_array($messages);
+            $totalBatches = ceil($totalMessages / $batchSize);
+            
+            $this->logError("Starting batch migration: {$totalMessages} messages in {$totalBatches} batches of {$batchSize}");
+            
+            // Process messages in batches
+            for ($batchIndex = 0; $batchIndex < $totalBatches; $batchIndex++) {
+                $currentBatch = $batchIndex + 1;
+                $startIndex = $batchIndex * $batchSize;
+                $endIndex = min($startIndex + $batchSize, $totalMessages);
+                $batchMessages = array_slice($messagesArray, $startIndex, $batchSize);
+                
+                $this->logError("Processing batch {$currentBatch}/{$totalBatches}: messages " . ($startIndex + 1) . "-{$endIndex}");
+                
+                foreach ($batchMessages as $message) {
                     try {
-                        $messageDate = $message->getDate();
-                        // Convert DateTimeImmutable to DateTime if needed
-                        if ($messageDate instanceof \DateTimeImmutable) {
-                            $messageDate = \DateTime::createFromImmutable($messageDate);
-                        } elseif (!($messageDate instanceof \DateTime)) {
-                            // If it's a string or other format, create DateTime normally
-                            $messageDate = new \DateTime($messageDate);
-                        }
-                    } catch (Exception $dateEx) {
-                        $messageDate = new \DateTime(); // Use current date if date parsing fails
-                        $this->logError("Date parsing failed for message " . ($processedCount + 1) . ", using current date");
-                    }
-                    
-                    // First, add the message without flags
-                    $destination->addMessage($rawMessage, null, $messageDate);
-                    
-                    // Then apply flags if preservation is enabled
-                    if ($preserveFlags) {
-                        // Get the UID of the message we just added (it should be the last one)
-                        $newMessages = $destination->getMessages();
-                        $newMessage = null;
+                        // Get full message content
+                        $rawMessage = $message->getRawMessage();
                         
-                        // Find the last message (the one we just added)
-                        foreach ($newMessages as $msg) {
-                            $newMessage = $msg;
+                        // Get message date safely
+                        try {
+                            $messageDate = $message->getDate();
+                            // Convert DateTimeImmutable to DateTime if needed
+                            if ($messageDate instanceof \DateTimeImmutable) {
+                                $messageDate = \DateTime::createFromImmutable($messageDate);
+                            } elseif (!($messageDate instanceof \DateTime)) {
+                                // If it's a string or other format, create DateTime normally
+                                $messageDate = new \DateTime($messageDate);
+                            }
+                        } catch (Exception $dateEx) {
+                            $messageDate = new \DateTime(); // Use current date if date parsing fails
+                            $this->logError("Date parsing failed for message " . ($processedCount + 1) . ", using current date");
                         }
                         
-                        if ($newMessage) {
-                            // Debug: Log flag detection
-                            $isSeen = $message->isSeen();
-                            $isUnseen = $message->isUnseen();
-                            $isFlagged = $message->isFlagged();
-                            $isAnswered = $message->isAnswered();
-                            $isDraft = $message->isDraft();
-                            
-                            $this->logError("DEBUG: Message " . ($processedCount + 1) . " original flags - Seen: " . ($isSeen ? 'YES' : 'NO') . ", Unseen: " . ($isUnseen ? 'YES' : 'NO') . ", Flagged: " . ($isFlagged ? 'YES' : 'NO'));
-                            
-                            // Apply individual flags using setFlag() method
-                            $flagsApplied = [];
-                            
-                            if ($isSeen) {
-                                if ($newMessage->setFlag('\\Seen')) {
-                                    $flagsApplied[] = '\\Seen';
+                        // Add message to destination
+                        $destination->addMessage($rawMessage, null, $messageDate);
+                        
+                        // Apply flags if preservation is enabled
+                        if ($preserveFlags) {
+                            try {
+                                // Get the last message (the one we just added) to apply flags
+                                $newMessages = $destination->getMessages();
+                                $newMessage = null;
+                                
+                                // Find the last message
+                                foreach ($newMessages as $msg) {
+                                    $newMessage = $msg;
                                 }
-                            }
-                            if ($isFlagged) {
-                                if ($newMessage->setFlag('\\Flagged')) {
-                                    $flagsApplied[] = '\\Flagged';
+                                
+                                if ($newMessage) {
+                                    // Apply flags based on original message
+                                    if ($message->isSeen()) {
+                                        $newMessage->setFlag('\\Seen');
+                                    }
+                                    if ($message->isFlagged()) {
+                                        $newMessage->setFlag('\\Flagged');
+                                    }
+                                    if ($message->isAnswered()) {
+                                        $newMessage->setFlag('\\Answered');
+                                    }
+                                    if ($message->isDraft()) {
+                                        $newMessage->setFlag('\\Draft');
+                                    }
                                 }
+                            } catch (Exception $flagEx) {
+                                // Flag application failed, but message was still migrated
+                                $this->logError("Warning: Could not apply flags to migrated message " . ($processedCount + 1) . ": " . $flagEx->getMessage());
                             }
-                            if ($isAnswered) {
-                                if ($newMessage->setFlag('\\Answered')) {
-                                    $flagsApplied[] = '\\Answered';
-                                }
-                            }
-                            if ($isDraft) {
-                                if ($newMessage->setFlag('\\Draft')) {
-                                    $flagsApplied[] = '\\Draft';
-                                }
-                            }
-                            
-                            $this->logError("DEBUG: Flags successfully applied: " . (empty($flagsApplied) ? 'NONE' : implode(' ', $flagsApplied)));
-                        } else {
-                            $this->logError("DEBUG: Could not find newly added message to apply flags");
                         }
+                        
+                        $migratedCount++;
+                        
+                    } catch (Exception $e) {
+                        $errorCount++;
+                        $this->logError("Failed to migrate message " . ($processedCount + 1) . ": " . $e->getMessage());
                     }
                     
-                    $migratedCount++;
-                    
-                } catch (Exception $e) {
-                    $errorCount++;
-                    $this->logError("Failed to migrate message " . ($processedCount + 1) . ": " . $e->getMessage());
+                    $processedCount++;
                 }
                 
-                $processedCount++;
+                // Log batch completion and add small pause
+                $this->logError("Completed batch {$currentBatch}/{$totalBatches}: {$migratedCount} messages migrated so far");
                 
-                // Progress reporting could be added here
+                // Small pause between batches to prevent overwhelming the server
+                if ($currentBatch < $totalBatches) {
+                    usleep(500000); // 0.5 second pause between batches
+                }
             }
             
             return [
                 'success' => true,
-                'total' => $maxMessages, // Show actual processed count
+                'total' => $totalMessages,
                 'migrated' => $migratedCount,
                 'errors' => $errorCount,
-                'message' => "Migration completed: {$migratedCount}/{$maxMessages} messages migrated"
+                'message' => "Migration completed: {$migratedCount}/{$totalMessages} messages migrated"
             ];
             
         } catch (Exception $e) {
