@@ -48,7 +48,7 @@ session_start();
                             <div class="form-group">
                                 <label for="source_host">Servidor IMAP</label>
                                 <input type="text" id="source_host" name="source_host" class="form-control" 
-                                       placeholder="mail.ejemplo.com" required>
+                                       value="ebonemx.plesk.trevenque.es" placeholder="mail.ejemplo.com" required>
                             </div>
                         </div>
                         <div class="col">
@@ -65,13 +65,14 @@ session_start();
                             <div class="form-group">
                                 <label for="source_username">Usuario/Email</label>
                                 <input type="email" id="source_username" name="source_username" class="form-control" 
-                                       placeholder="usuario@origen.com" required>
+                                       value="testorigen@ebone.es" placeholder="usuario@origen.com" required>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label for="source_password">Contraseña</label>
-                                <input type="password" id="source_password" name="source_password" class="form-control" required>
+                                <input type="password" id="source_password" name="source_password" class="form-control" 
+                                       value="6Z7h3^h5o" required>
                             </div>
                         </div>
                     </div>
@@ -93,7 +94,7 @@ session_start();
                             <div class="form-group">
                                 <label for="dest_host">Servidor IMAP</label>
                                 <input type="text" id="dest_host" name="dest_host" class="form-control" 
-                                       placeholder="mail.destino.com" required>
+                                       value="ebonemx.plesk.trevenque.es" placeholder="mail.destino.com" required>
                             </div>
                         </div>
                         <div class="col">
@@ -110,13 +111,14 @@ session_start();
                             <div class="form-group">
                                 <label for="dest_username">Usuario/Email</label>
                                 <input type="email" id="dest_username" name="dest_username" class="form-control" 
-                                       placeholder="usuario@destino.com" required>
+                                       value="test@ebone.es" placeholder="usuario@destino.com" required>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label for="dest_password">Contraseña</label>
-                                <input type="password" id="dest_password" name="dest_password" class="form-control" required>
+                                <input type="password" id="dest_password" name="dest_password" class="form-control" 
+                                       value="za*4e768D" required>
                             </div>
                         </div>
                     </div>
@@ -152,7 +154,7 @@ session_start();
                     <div class="form-group">
                         <label for="batch_size">Emails por lote (menor = más seguro)</label>
                         <input type="number" id="batch_size" name="batch_size" class="form-control" 
-                               value="<?= $config['batch_size'] ?>" min="1" max="200">
+                               value="2" min="1" max="200">
                     </div>
                 </div>
 
