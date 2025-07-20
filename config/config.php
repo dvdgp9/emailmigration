@@ -18,7 +18,7 @@ return [
     'preserve_structure' => true, // Maintain folder hierarchy
     
     // UI Settings
-    'app_name' => 'Mail Migration Tool',
+    'app_name' => 'Migrabox',
     'app_version' => '1.0.0',
     'theme' => 'default',
     
