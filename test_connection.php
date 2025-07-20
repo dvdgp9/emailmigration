@@ -4,6 +4,16 @@
  * Prueba de conexión a servidores IMAP
  */
 
+// Clean any existing output buffer and disable error display to avoid JSON corruption
+if (ob_get_level()) {
+    ob_end_clean();
+}
+ob_start();
+
+// Disable error display to prevent HTML error messages from corrupting JSON
+ini_set('display_errors', 0);
+error_reporting(0);
+
 // Set proper headers
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -15,6 +25,7 @@ $config = require_once 'config/config.php';
 
 // Check if vendor directory exists (composer dependencies installed)
 if (!file_exists('vendor/autoload.php')) {
+    ob_clean();
     echo json_encode([
         'success' => false,
         'message' => '❌ Dependencias no instaladas.\n\nPasos para instalar:\n1. Instalar Composer (getcomposer.org)\n2. Ejecutar: composer install\n3. Subir carpeta vendor/ al servidor'
@@ -29,6 +40,7 @@ use MailMigration\ImapConnector;
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    ob_clean();
     echo json_encode([
         'success' => false,
         'message' => 'Only POST requests allowed'
@@ -68,6 +80,7 @@ try {
     }
     
     if (!empty($errors)) {
+        ob_clean();
         echo json_encode([
             'success' => false,
             'message' => implode('\n', $errors)
@@ -81,6 +94,7 @@ try {
     // Test source connection
     $sourceResult = $connector->testConnection($sourceConfig);
     if (!$sourceResult['success']) {
+        ob_clean();
         echo json_encode([
             'success' => false,
             'message' => "❌ Error en servidor ORIGEN:\n" . $sourceResult['message']
@@ -91,6 +105,7 @@ try {
     // Test destination connection
     $destResult = $connector->testConnection($destConfig);
     if (!$destResult['success']) {
+        ob_clean();
         echo json_encode([
             'success' => false,
             'message' => "❌ Error en servidor DESTINO:\n" . $destResult['message']
@@ -104,6 +119,8 @@ try {
     $totalSourceMailboxes = $sourceResult['mailbox_count'];
     $totalDestMailboxes = $destResult['mailbox_count'];
     
+    // Clean buffer and output JSON
+    ob_clean();
     echo json_encode([
         'success' => true,
         'message' => "✅ ¡Ambas conexiones exitosas!\n\n📊 RESUMEN:\n" .
@@ -125,6 +142,7 @@ try {
     }
     file_put_contents($logFile, $logMessage, FILE_APPEND | LOCK_EX);
     
+    ob_clean();
     echo json_encode([
         'success' => false,
         'message' => "❌ Error interno:\n" . $e->getMessage()

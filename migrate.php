@@ -4,6 +4,16 @@
  * Manejador principal de migración de correos
  */
 
+// Clean any existing output buffer and disable error display to avoid JSON corruption
+if (ob_get_level()) {
+    ob_end_clean();
+}
+ob_start();
+
+// Disable error display to prevent HTML error messages from corrupting JSON
+ini_set('display_errors', 0);
+error_reporting(0);
+
 // Set proper headers
 header('Content-Type: application/json');
 
@@ -12,6 +22,7 @@ $config = require_once 'config/config.php';
 
 // Check if dependencies are installed
 if (!file_exists('vendor/autoload.php')) {
+    ob_clean();
     echo json_encode([
         'success' => false,
         'message' => '❌ Dependencias no instaladas. Ejecutar: composer install'
@@ -26,6 +37,7 @@ use MailMigration\ImapConnector;
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    ob_clean();
     echo json_encode([
         'success' => false,
         'message' => 'Only POST requests allowed'
@@ -72,6 +84,7 @@ try {
     }
     
     if (!empty($errors)) {
+        ob_clean();
         echo json_encode([
             'success' => false,
             'message' => implode('\n', $errors)
@@ -194,6 +207,8 @@ try {
     
     $overallSuccess = count($failedMailboxes) === 0;
     
+    // Clean buffer and output JSON
+    ob_clean();
     echo json_encode([
         'success' => $overallSuccess,
         'message' => $overallSuccess 
@@ -234,6 +249,7 @@ try {
     }
     file_put_contents($logFile, $logMessage, FILE_APPEND | LOCK_EX);
     
+    ob_clean();
     echo json_encode([
         'success' => false,
         'message' => "❌ Error interno durante migración:\n" . $e->getMessage()
