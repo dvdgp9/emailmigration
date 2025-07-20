@@ -410,6 +410,13 @@ foreach ($message->getAttachments() as $attachment) {
 - **Lesson Testing.3**: Deshabilitar display_errors en producción previene corrupción de JSON
 - **Lesson Testing.4**: Herramientas de debug modulares facilitan troubleshooting rápido
 
+### BUG CRÍTICO ENCONTRADO Y SOLUCIONADO
+- **Lesson Debug.1**: Error suppression puede ocultar errores fatales - debug version sin suppression esencial
+- **Lesson Debug.2**: **Fatal Error**: `Ddeboer\Imap\Mailbox::getFullName()` no existe en ddeboer/imap v1.21
+- **Lesson Debug.3**: **Fatal Error**: `Ddeboer\Imap\Mailbox::getDelimiter()` no existe en ddeboer/imap v1.21
+- **Lesson Debug.4**: Verificar métodos disponibles de librerías antes de usar - API puede cambiar entre versiones
+- **Lesson Debug.5**: Testing sistemático (migrate_debug.php) identificó error en 3 pasos vs horas de adivinación
+
 ---
 
 ## Conclusión del Planner

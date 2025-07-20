@@ -140,9 +140,7 @@ class ImapConnector
         foreach ($this->sourceConnection->getMailboxes() as $mailbox) {
             $mailboxes[] = [
                 'name' => $mailbox->getName(),
-                'full_name' => $mailbox->getFullName(),
-                'count' => $mailbox->count(),
-                'delimiter' => $mailbox->getDelimiter()
+                'count' => $mailbox->count()
             ];
         }
         
@@ -164,9 +162,7 @@ class ImapConnector
         foreach ($this->destinationConnection->getMailboxes() as $mailbox) {
             $mailboxes[] = [
                 'name' => $mailbox->getName(),
-                'full_name' => $mailbox->getFullName(),
-                'count' => $mailbox->count(),
-                'delimiter' => $mailbox->getDelimiter()
+                'count' => $mailbox->count()
             ];
         }
         
