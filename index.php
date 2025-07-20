@@ -70,7 +70,7 @@ session_start();
                             <div class="form-group">
                                 <label for="source_username">Usuario/Email</label>
                                 <input type="email" id="source_username" name="source_username" class="form-control" 
-                                       value="testorigen@ebone.es" placeholder="usuario@origen.com" required>
+                                       placeholder="usuario@origen.com" required>
                             </div>
                         </div>
                         <div class="col">
@@ -119,7 +119,7 @@ session_start();
                             <div class="form-group">
                                 <label for="dest_username">Usuario/Email</label>
                                 <input type="email" id="dest_username" name="dest_username" class="form-control" 
-                                       value="test@ebone.es" placeholder="usuario@destino.com" required>
+                                       placeholder="usuario@destino.com" required>
                             </div>
                         </div>
                         <div class="col">

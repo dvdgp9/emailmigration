@@ -19,7 +19,7 @@ return [
     
     // UI Settings
     'app_name' => 'Migrabox',
-    'app_version' => '1.0.0',
+    'app_version' => '2.0.0',
     'theme' => 'default',
     
     // Security

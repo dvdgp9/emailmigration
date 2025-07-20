@@ -1,22 +1,25 @@
-# 📧 Mail Migration Tool
+# 📦 Migrabox
 
-Herramienta web para migrar correos entre servidores IMAP de manera sencilla y eficiente.
+Herramienta web profesional para migrar correos entre servidores IMAP de manera sencilla, eficiente y con estilo moderno.
 
 ## 🚀 Características
 
-- **Universal**: Funciona con cualquier servidor IMAP (Gmail, Outlook, Plesk, cPanel, etc.)
-- **Interfaz intuitiva**: Webapp fácil de usar con formularios simples
-- **Migración completa**: Incluye attachments, flags y estructura de carpetas
-- **Progreso en tiempo real**: Seguimiento visual del proceso de migración
-- **Configurable**: Opciones personalizables para diferentes necesidades
-- **Optimizada para cPanel**: Perfecta para hosting compartido
+- **🌐 Universal**: Compatible con cualquier servidor IMAP (Gmail, Outlook, Plesk, cPanel, etc.)
+- **✨ Interfaz Moderna**: Diseño profesional estilo Airbnb con UX optimizada
+- **📧 Migración Completa**: Incluye attachments, flags, estructura de carpetas y metadatos
+- **⚡ Progreso en Tiempo Real**: Seguimiento visual con barra de progreso avanzada
+- **🔧 Altamente Configurable**: Opciones de batch, timeouts y filtros personalizables
+- **🏗️ Optimizada para cPanel**: Perfecta para hosting compartido y servidores dedicados
+- **🔄 Procesamiento por Lotes**: Manejo eficiente de grandes volúmenes de correo
+- **🛡️ Preservación de Flags**: Mantiene estados de lectura, flags personalizados y más
 
 ## 📋 Requisitos
 
-- PHP 7.4 o superior
-- Extensión PHP IMAP habilitada
-- Composer (para dependencias)
-- Servidor web (Apache/Nginx)
+- **PHP 8.0+** (recomendado 8.3+)
+- **Extensión PHP IMAP** habilitada
+- **Composer** (para gestión de dependencias)
+- **Servidor web** (Apache/Nginx)
+- **Memoria**: Mínimo 128MB, recomendado 256MB+ para grandes migraciones
 
 ## 🔧 Instalación
 
@@ -33,8 +36,8 @@ Herramienta web para migrar correos entre servidores IMAP de manera sencilla y e
 
 1. **Clonar o descargar el proyecto:**
    ```bash
-   git clone [repository-url] mail-migration
-   cd mail-migration
+   git clone [repository-url] migrabox
+   cd migrabox
    ```
 
 2. **Verificar requisitos del sistema:**
@@ -70,22 +73,31 @@ Herramienta web para migrar correos entre servidores IMAP de manera sencilla y e
 
 ## 🎯 Uso
 
-1. Acceder a `index.php` desde tu navegador
-2. Completar los datos del **servidor de origen**:
-   - Servidor IMAP
+1. **Acceder** a `index.php` desde tu navegador
+2. **Completar datos del servidor de origen**:
+   - Servidor IMAP (ej: imap.gmail.com)
    - Puerto (993 para SSL, 143 para no SSL)
-   - Usuario y contraseña
-3. Completar los datos del **servidor de destino**
-4. Configurar opciones de migración
-5. Hacer clic en **"Probar Conexiones"** para verificar
-6. Hacer clic en **"Iniciar Migración"**
+   - Usuario/Email y contraseña
+3. **Completar datos del servidor de destino**
+4. **Configurar opciones avanzadas**:
+   - Tamaño de lote (recomendado: 50-100)
+   - Preservar flags y estructura
+   - Timeout personalizado
+5. **Probar conexiones** antes de migrar
+6. **Iniciar migración** y seguir progreso en tiempo real
+
+### 🎨 **Nueva Interfaz Airbnb-Style**
+- **Diseño Moderno**: Inspirado en los mejores estándares de UI/UX
+- **Responsive**: Optimizado para desktop y móvil
+- **Intuitive**: Flujo de trabajo simplificado y claro
+- **Progress Tracking**: Barra de progreso visual con detalles en tiempo real
 
 ## 📁 Estructura del Proyecto
 
 ```
-mail-migration/
-├── assets/                 # CSS y archivos estáticos
-│   └── style.css          # Estilos de la interfaz web
+migrabox/
+├── assets/                 # CSS y archivos estáticos  
+│   └── style.css          # Estilos modernos estilo Airbnb
 ├── config/                 # Archivos de configuración
 │   └── config.php         # Configuración principal
 ├── logs/                   # Logs de migración
@@ -105,10 +117,28 @@ mail-migration/
 
 Editar `config/config.php` para personalizar:
 
-- Timeouts de conexión
-- Tamaño de lotes para migración
-- Configuraciones de logging
-- Puertos por defecto
+- **Timeouts de conexión**: Ajustar según velocidad del servidor
+- **Tamaño de lotes**: Optimizar para volumen de emails (default: 50)
+- **Configuraciones de logging**: Nivel de detalle en logs
+- **Puertos por defecto**: SSL (993) vs No-SSL (143)
+- **Memoria límites**: Para migraciones de gran volumen
+
+### 🔧 **Configuraciones Recomendadas**
+
+**Para Migraciones Pequeñas (< 1000 emails):**
+- Batch size: 100
+- Timeout: 30s
+- Memory limit: 128MB
+
+**Para Migraciones Medianas (1K-10K emails):**
+- Batch size: 50
+- Timeout: 60s  
+- Memory limit: 256MB
+
+**Para Migraciones Grandes (> 10K emails):**
+- Batch size: 25-50
+- Timeout: 120s
+- Memory limit: 512MB+
 
 ## 🔒 Seguridad
 
@@ -137,5 +167,6 @@ Para soporte, crear un issue en el repositorio o contactar al desarrollador.
 
 ---
 
-**Versión**: 1.0.0  
-**Estado**: En desarrollo activo 
+**Versión**: 2.0.0  
+**Estado**: ✅ Producción estable con UI moderna  
+**Último Update**: Diseño Airbnb-style, procesamiento por lotes optimizado 
