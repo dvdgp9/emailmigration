@@ -221,8 +221,8 @@ class ImapConnector
             $migratedCount = 0;
             $errorCount = 0;
             
-            // Limit messages for testing/safety
-            $maxMessages = min($batchSize, $totalMessages, 5); // Max 5 messages for testing
+            // Process all messages up to batch size limit
+            $maxMessages = min($batchSize, $totalMessages);
             $processedCount = 0;
             
             foreach ($messages as $message) {
@@ -230,16 +230,10 @@ class ImapConnector
                     break; // Stop after processing maxMessages
                 }
                 try {
-                    // Log each step for debugging
-                    $this->logError("DEBUG: Starting message " . ($processedCount + 1));
-                    
                     // Get full message content
-                    $this->logError("DEBUG: Getting raw message...");
                     $rawMessage = $message->getRawMessage();
-                    $this->logError("DEBUG: Got raw message, size: " . strlen($rawMessage) . " bytes");
                     
                     // Get message date safely
-                    $this->logError("DEBUG: Getting message date...");
                     try {
                         $messageDate = $message->getDate();
                         // Convert DateTimeImmutable to DateTime if needed
@@ -251,26 +245,47 @@ class ImapConnector
                         }
                     } catch (Exception $dateEx) {
                         $messageDate = new \DateTime(); // Use current date if date parsing fails
-                        $this->logError("DEBUG: Date parsing failed, using current date: " . $dateEx->getMessage());
+                        $this->logError("Date parsing failed for message " . ($processedCount + 1) . ", using current date");
                     }
                     
-                    // Append to destination
-                    $this->logError("DEBUG: Adding message to destination...");
-                    $destination->addMessage($rawMessage, null, $messageDate);
-                    $this->logError("DEBUG: Message added successfully");
+                    // Build flags string if preservation is enabled
+                    $flags = [];
+                    if ($preserveFlags) {
+                        // Debug: Log flag detection
+                        $isSeen = $message->isSeen();
+                        $isUnseen = $message->isUnseen();
+                        $isFlagged = $message->isFlagged();
+                        $isAnswered = $message->isAnswered();
+                        $isDraft = $message->isDraft();
+                        
+                        $this->logError("DEBUG: Message " . ($processedCount + 1) . " flags - Seen: " . ($isSeen ? 'YES' : 'NO') . ", Unseen: " . ($isUnseen ? 'YES' : 'NO') . ", Flagged: " . ($isFlagged ? 'YES' : 'NO'));
+                        
+                        if ($isSeen) {
+                            $flags[] = '\\Seen';
+                        }
+                        if ($isFlagged) {
+                            $flags[] = '\\Flagged';
+                        }
+                        if ($isAnswered) {
+                            $flags[] = '\\Answered';
+                        }
+                        if ($isDraft) {
+                            $flags[] = '\\Draft';
+                        }
+                        // Note: We skip \\Deleted as we don't want to migrate deleted messages
+                    }
                     
-                    // Skip flag preservation for now to avoid complications
-                    // if ($preserveFlags && $message->isSeen()) {
-                    //     // Note: Flag handling would need additional implementation
-                    // }
+                    $flagsString = !empty($flags) ? implode(' ', $flags) : null;
+                    $this->logError("DEBUG: Flags to apply: " . ($flagsString ?: 'NONE'));
+                    
+                    // Append to destination with preserved flags
+                    $destination->addMessage($rawMessage, $flagsString, $messageDate);
                     
                     $migratedCount++;
-                    $this->logError("DEBUG: Message " . ($processedCount + 1) . " completed successfully");
                     
                 } catch (Exception $e) {
                     $errorCount++;
-                    $this->logError("DEBUG: Exception in message " . ($processedCount + 1) . ": " . $e->getMessage());
-                    $this->logError("Failed to migrate message: " . $e->getMessage());
+                    $this->logError("Failed to migrate message " . ($processedCount + 1) . ": " . $e->getMessage());
                 }
                 
                 $processedCount++;
@@ -283,7 +298,7 @@ class ImapConnector
                 'total' => $maxMessages, // Show actual processed count
                 'migrated' => $migratedCount,
                 'errors' => $errorCount,
-                'message' => "Migration completed: {$migratedCount}/{$maxMessages} messages migrated (limited for testing)"
+                'message' => "Migration completed: {$migratedCount}/{$maxMessages} messages migrated"
             ];
             
         } catch (Exception $e) {
