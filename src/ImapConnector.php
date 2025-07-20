@@ -241,10 +241,17 @@ class ImapConnector
                     // Get message date safely
                     $this->logError("DEBUG: Getting message date...");
                     try {
-                        $messageDate = new \DateTime($message->getDate());
+                        $messageDate = $message->getDate();
+                        // Convert DateTimeImmutable to DateTime if needed
+                        if ($messageDate instanceof \DateTimeImmutable) {
+                            $messageDate = \DateTime::createFromImmutable($messageDate);
+                        } elseif (!($messageDate instanceof \DateTime)) {
+                            // If it's a string or other format, create DateTime normally
+                            $messageDate = new \DateTime($messageDate);
+                        }
                     } catch (Exception $dateEx) {
                         $messageDate = new \DateTime(); // Use current date if date parsing fails
-                        $this->logError("DEBUG: Date parsing failed, using current date");
+                        $this->logError("DEBUG: Date parsing failed, using current date: " . $dateEx->getMessage());
                     }
                     
                     // Append to destination
