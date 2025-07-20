@@ -232,7 +232,7 @@ try {
             'migration_results' => $migrationResults
         ]
     ]);
-
+    
 } catch (Exception $e) {
     // Clean up connections
     if (isset($connector)) {
