@@ -248,38 +248,59 @@ class ImapConnector
                         $this->logError("Date parsing failed for message " . ($processedCount + 1) . ", using current date");
                     }
                     
-                    // Build flags string if preservation is enabled
-                    $flags = [];
+                    // First, add the message without flags
+                    $destination->addMessage($rawMessage, null, $messageDate);
+                    
+                    // Then apply flags if preservation is enabled
                     if ($preserveFlags) {
-                        // Debug: Log flag detection
-                        $isSeen = $message->isSeen();
-                        $isUnseen = $message->isUnseen();
-                        $isFlagged = $message->isFlagged();
-                        $isAnswered = $message->isAnswered();
-                        $isDraft = $message->isDraft();
+                        // Get the UID of the message we just added (it should be the last one)
+                        $newMessages = $destination->getMessages();
+                        $newMessage = null;
                         
-                        $this->logError("DEBUG: Message " . ($processedCount + 1) . " flags - Seen: " . ($isSeen ? 'YES' : 'NO') . ", Unseen: " . ($isUnseen ? 'YES' : 'NO') . ", Flagged: " . ($isFlagged ? 'YES' : 'NO'));
+                        // Find the last message (the one we just added)
+                        foreach ($newMessages as $msg) {
+                            $newMessage = $msg;
+                        }
                         
-                        if ($isSeen) {
-                            $flags[] = '\\Seen';
+                        if ($newMessage) {
+                            // Debug: Log flag detection
+                            $isSeen = $message->isSeen();
+                            $isUnseen = $message->isUnseen();
+                            $isFlagged = $message->isFlagged();
+                            $isAnswered = $message->isAnswered();
+                            $isDraft = $message->isDraft();
+                            
+                            $this->logError("DEBUG: Message " . ($processedCount + 1) . " original flags - Seen: " . ($isSeen ? 'YES' : 'NO') . ", Unseen: " . ($isUnseen ? 'YES' : 'NO') . ", Flagged: " . ($isFlagged ? 'YES' : 'NO'));
+                            
+                            // Apply individual flags using setFlag() method
+                            $flagsApplied = [];
+                            
+                            if ($isSeen) {
+                                if ($newMessage->setFlag('\\Seen')) {
+                                    $flagsApplied[] = '\\Seen';
+                                }
+                            }
+                            if ($isFlagged) {
+                                if ($newMessage->setFlag('\\Flagged')) {
+                                    $flagsApplied[] = '\\Flagged';
+                                }
+                            }
+                            if ($isAnswered) {
+                                if ($newMessage->setFlag('\\Answered')) {
+                                    $flagsApplied[] = '\\Answered';
+                                }
+                            }
+                            if ($isDraft) {
+                                if ($newMessage->setFlag('\\Draft')) {
+                                    $flagsApplied[] = '\\Draft';
+                                }
+                            }
+                            
+                            $this->logError("DEBUG: Flags successfully applied: " . (empty($flagsApplied) ? 'NONE' : implode(' ', $flagsApplied)));
+                        } else {
+                            $this->logError("DEBUG: Could not find newly added message to apply flags");
                         }
-                        if ($isFlagged) {
-                            $flags[] = '\\Flagged';
-                        }
-                        if ($isAnswered) {
-                            $flags[] = '\\Answered';
-                        }
-                        if ($isDraft) {
-                            $flags[] = '\\Draft';
-                        }
-                        // Note: We skip \\Deleted as we don't want to migrate deleted messages
                     }
-                    
-                    $flagsString = !empty($flags) ? implode(' ', $flags) : null;
-                    $this->logError("DEBUG: Flags to apply: " . ($flagsString ?: 'NONE'));
-                    
-                    // Append to destination with preserved flags
-                    $destination->addMessage($rawMessage, $flagsString, $messageDate);
                     
                     $migratedCount++;
                     
