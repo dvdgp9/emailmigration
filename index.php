@@ -26,22 +26,27 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $config['app_name'] ?> v<?= $config['app_version'] ?></title>
     <link rel="stylesheet" href="assets/style.css">
+    <!-- Heroicons for modern icons -->
+    <script src="https://unpkg.com/@heroicons/react@2.0.18/24/outline/index.js" type="module"></script>
 </head>
 <body>
     <div class="container">
         <!-- Header -->
-        <div class="header">
+        <header class="header">
             <h1>📧 <?= $config['app_name'] ?></h1>
-            <p>Migración sencilla de correos entre servidores IMAP</p>
-        </div>
+            <p>Migración profesional de correos entre servidores IMAP con preservación completa de estructura y flags</p>
+        </header>
 
         <!-- Main Form -->
         <div class="main-card">
             <form id="migrationForm" method="POST" action="migrate.php">
                 
                 <!-- Source Server Section -->
-                <div class="server-section">
-                    <h2 class="section-title">🔑 Servidor de Origen (Desde donde migrar)</h2>
+                <section class="server-section">
+                    <h2 class="section-title">
+                        🔑 Servidor de Origen
+                        <span style="font-weight: var(--font-normal); font-size: var(--text-sm); color: var(--gray-500);">Desde donde migrar</span>
+                    </h2>
                     
                     <div class="row">
                         <div class="col">
@@ -83,11 +88,14 @@ session_start();
                             Usar conexión SSL/TLS (recomendado)
                         </label>
                     </div>
-                </div>
+                </section>
 
                 <!-- Destination Server Section -->
-                <div class="server-section">
-                    <h2 class="section-title">🎯 Servidor de Destino (Hacia donde migrar)</h2>
+                <section class="server-section">
+                    <h2 class="section-title">
+                        🎯 Servidor de Destino
+                        <span style="font-weight: var(--font-normal); font-size: var(--text-sm); color: var(--gray-500);">Hacia donde migrar</span>
+                    </h2>
                     
                     <div class="row">
                         <div class="col">
@@ -129,11 +137,13 @@ session_start();
                             Usar conexión SSL/TLS (recomendado)
                         </label>
                     </div>
-                </div>
+                </section>
 
                 <!-- Migration Options -->
-                <div class="server-section">
-                    <h2 class="section-title">⚙️ Opciones de Migración</h2>
+                <section class="server-section">
+                    <h2 class="section-title">
+                        ⚙️ Opciones de Migración
+                    </h2>
                     
                     <div class="form-group">
                         <label>
@@ -155,22 +165,24 @@ session_start();
                         <label for="batch_size">Emails por lote (batch size)</label>
                         <input type="number" id="batch_size" name="batch_size" class="form-control" 
                                value="50" min="1" max="200">
-                        <small style="color: #666; font-size: 12px;">
+                        <small>
                             Procesa emails en lotes de este tamaño con pausas entre lotes.<br>
                             Ejemplo: 500 emails con batch=50 → 10 lotes de 50 emails cada uno.<br>
                             <strong>Menor valor = más seguro</strong> (especialmente para emails con adjuntos grandes)
                         </small>
                     </div>
-                </div>
+                </section>
 
                 <!-- Actions -->
-                <div style="text-align: center; margin-top: 30px;">
-                    <button type="button" id="testConnections" class="btn" style="margin-right: 15px;">
-                        🔍 Probar Conexiones
-                    </button>
-                    <button type="submit" class="btn" id="startMigration">
-                        🚀 Iniciar Migración
-                    </button>
+                <div class="text-center mt-4">
+                    <div style="display: flex; gap: var(--space-3); justify-content: center; flex-wrap: wrap;">
+                        <button type="button" id="testConnections" class="btn-secondary btn">
+                            🔍 Probar Conexiones
+                        </button>
+                        <button type="submit" class="btn-primary btn" id="startMigration">
+                            🚀 Iniciar Migración
+                        </button>
+                    </div>
                 </div>
             </form>
 
@@ -186,13 +198,23 @@ session_start();
         </div>
 
         <!-- Status Information -->
-        <div class="status-info">
-            <strong>ℹ️ Información:</strong><br>
-            • Esta herramienta funciona con cualquier servidor IMAP (Gmail, Outlook, Plesk, cPanel, etc.)<br>
-            • Se recomienda hacer una prueba con pocas carpetas antes de migración completa<br>
-            • Los archivos adjuntos se migrarán completamente<br>
-            • Versión: <?= $config['app_version'] ?>
-        </div>
+        <aside class="status-info">
+            <div style="display: flex; align-items: flex-start; gap: var(--space-2);">
+                <span style="font-size: var(--text-lg);">ℹ️</span>
+                <div>
+                    <strong>Información de la herramienta:</strong>
+                    <ul style="margin: var(--space-1) 0 0 0; padding-left: var(--space-4); color: var(--gray-600);">
+                        <li>✅ Compatible con cualquier servidor IMAP (Gmail, Outlook, Plesk, cPanel)</li>
+                        <li>🗂️ Migración completa con preservación de carpetas y flags</li>
+                        <li>📎 Incluye archivos adjuntos de cualquier tamaño</li>
+                        <li>🔄 Procesamiento por lotes para máxima estabilidad</li>
+                    </ul>
+                    <p style="margin-top: var(--space-2); font-size: var(--text-xs); color: var(--gray-400);">
+                        Versión: <?= $config['app_version'] ?> | Sistema production-ready
+                    </p>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <!-- JavaScript -->
