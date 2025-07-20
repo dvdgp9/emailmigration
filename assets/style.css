@@ -50,15 +50,15 @@
   --font-semibold: 600;
   --font-bold: 700;
   
-  /* Spacing System (8px base) */
+  /* Spacing System (8px base) - Compacted */
   --space-1: 0.5rem;   /* 8px */
-  --space-2: 1rem;     /* 16px */
-  --space-3: 1.5rem;   /* 24px */
-  --space-4: 2rem;     /* 32px */
-  --space-5: 2.5rem;   /* 40px */
-  --space-6: 3rem;     /* 48px */
-  --space-8: 4rem;     /* 64px */
-  --space-12: 6rem;    /* 96px */
+  --space-2: 0.75rem;  /* 12px - Reduced from 16px */
+  --space-3: 1rem;     /* 16px - Reduced from 24px */
+  --space-4: 1.25rem;  /* 20px - Reduced from 32px */
+  --space-5: 1.5rem;   /* 24px - Reduced from 40px */
+  --space-6: 2rem;     /* 32px - Reduced from 48px */
+  --space-8: 2.5rem;   /* 40px - Reduced from 64px */
+  --space-12: 3.5rem;  /* 56px - Reduced from 96px */
   
   /* Border Radius */
   --radius-sm: 4px;
@@ -101,43 +101,44 @@ body {
 .container {
     max-width: 1128px;
     margin: 0 auto;
-    padding: var(--space-3);
+    padding: var(--space-2);
 }
 
 .header {
     text-align: center;
-    margin-bottom: var(--space-8);
-    padding: var(--space-8) var(--space-4);
+    margin-bottom: var(--space-4);
+    padding: var(--space-4) var(--space-3);
 }
 
 .header h1 {
-    font-size: var(--text-3xl);
+    font-size: var(--text-2xl);
     font-weight: var(--font-bold);
     color: var(--gray-900);
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
     letter-spacing: -0.025em;
 }
 
 .header p {
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
     color: var(--gray-600);
     font-weight: var(--font-normal);
     max-width: 600px;
     margin: 0 auto;
+    line-height: 1.5;
 }
 
 .main-card {
     background: var(--white);
-    border-radius: var(--radius-2xl);
-    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
     box-shadow: var(--shadow-lg);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-4);
     border: 1px solid var(--gray-200);
 }
 
 /* Form Components */
 .form-group {
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-3);
 }
 
 .form-group label {
@@ -150,15 +151,15 @@ body {
 
 .form-control {
     width: 100%;
-    padding: var(--space-3) var(--space-2);
+    padding: var(--space-2) var(--space-2);
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-md);
-    font-size: var(--text-base);
+    font-size: var(--text-sm);
     font-family: inherit;
     color: var(--gray-900);
     background: var(--white);
     transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
-    min-height: 48px; /* Touch-friendly */
+    min-height: 42px; /* Touch-friendly but more compact */
 }
 
 .form-control:focus {
@@ -188,16 +189,16 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-md);
-    font-size: var(--text-base);
+    font-size: var(--text-sm);
     font-weight: var(--font-medium);
     font-family: inherit;
     text-decoration: none;
     cursor: pointer;
     transition: all var(--transition-normal);
     border: 1px solid transparent;
-    min-height: 48px; /* Touch-friendly */
+    min-height: 42px; /* Touch-friendly but more compact */
     gap: var(--space-1);
 }
 
@@ -262,8 +263,8 @@ body {
 /* Layout System */
 .row {
     display: flex;
-    gap: var(--space-3);
-    margin-bottom: var(--space-4);
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
 }
 
 .col {
@@ -272,21 +273,21 @@ body {
 
 .section-title {
     color: var(--gray-900);
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
     font-weight: var(--font-semibold);
-    margin-bottom: var(--space-4);
-    padding-bottom: var(--space-2);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-1);
     border-bottom: 1px solid var(--gray-200);
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-1);
 }
 
 .server-section {
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    margin-bottom: var(--space-6);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
     background: var(--white);
     position: relative;
 }
@@ -306,10 +307,10 @@ body {
     background: var(--gray-50);
     border: 1px solid var(--gray-200);
     border-left: 4px solid var(--primary-500);
-    padding: var(--space-4);
+    padding: var(--space-3);
     border-radius: var(--radius-md);
-    margin-bottom: var(--space-4);
-    font-size: var(--text-sm);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
     color: var(--gray-600);
 }
 
@@ -318,8 +319,8 @@ body {
     background: var(--white);
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    margin-top: var(--space-6);
+    padding: var(--space-4);
+    margin-top: var(--space-4);
     display: none;
     box-shadow: var(--shadow-sm);
 }
@@ -424,7 +425,7 @@ label:has(input[type="checkbox"]) {
     align-items: center;
     font-weight: var(--font-normal);
     cursor: pointer;
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
 }
 
 label:has(input[type="checkbox"]):hover {
@@ -438,72 +439,79 @@ label:has(input[type="checkbox"]):hover {
     }
     
     .header {
-        padding: var(--space-6) var(--space-2);
-        margin-bottom: var(--space-6);
-    }
-    
-    .header h1 {
-        font-size: var(--text-2xl);
-    }
-    
-    .header p {
-        font-size: var(--text-base);
-    }
-    
-    .main-card {
-        padding: var(--space-4);
-        border-radius: var(--radius-xl);
-        margin-bottom: var(--space-4);
-    }
-    
-    .row {
-        flex-direction: column;
-        gap: var(--space-2);
-    }
-    
-    .server-section {
-        padding: var(--space-4);
-        margin-bottom: var(--space-4);
-    }
-    
-    .section-title {
-        font-size: var(--text-lg);
-    }
-    
-    .btn {
-        padding: var(--space-3);
-        font-size: var(--text-base);
-        min-height: 48px;
-    }
-    
-    .form-control {
-        padding: var(--space-3);
-        min-height: 48px;
-        font-size: var(--text-base);
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: var(--space-2);
-    }
-    
-    .main-card {
-        padding: var(--space-3);
-        margin: var(--space-2);
-        border-radius: var(--radius-lg);
-    }
-    
-    .server-section {
-        padding: var(--space-3);
+        padding: var(--space-3) var(--space-2);
+        margin-bottom: var(--space-3);
     }
     
     .header h1 {
         font-size: var(--text-xl);
     }
     
+    .header p {
+        font-size: var(--text-sm);
+    }
+    
+    .main-card {
+        padding: var(--space-3);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--space-3);
+    }
+    
+    .row {
+        flex-direction: column;
+        gap: var(--space-2);
+        margin-bottom: var(--space-2);
+    }
+    
+    .server-section {
+        padding: var(--space-3);
+        margin-bottom: var(--space-3);
+    }
+    
+    .section-title {
+        font-size: var(--text-base);
+        margin-bottom: var(--space-2);
+    }
+    
+    .btn {
+        padding: var(--space-2);
+        font-size: var(--text-sm);
+        min-height: 42px;
+    }
+    
+    .form-control {
+        padding: var(--space-2);
+        min-height: 42px;
+        font-size: var(--text-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: var(--space-1);
+    }
+    
+    .main-card {
+        padding: var(--space-2);
+        margin: var(--space-1);
+        border-radius: var(--radius-md);
+    }
+    
+    .server-section {
+        padding: var(--space-2);
+    }
+    
+    .header {
+        padding: var(--space-2);
+        margin-bottom: var(--space-2);
+    }
+    
+    .header h1 {
+        font-size: var(--text-lg);
+    }
+    
     .progress-container {
-        padding: var(--space-4);
+        padding: var(--space-3);
     }
 }
 
