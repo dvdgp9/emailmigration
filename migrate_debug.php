@@ -128,15 +128,100 @@ try {
     $connector = new ImapConnector($config);
     echo "DEBUG: ImapConnector created successfully\n";
     
-    // Return success for now - we've proven the code loads correctly
+    // Test source connection (this should work based on test_connection.php)
+    echo "DEBUG: Testing source connection...\n";
+    $sourceTest = $connector->testConnection($sourceConfig);
+    echo "DEBUG: Source test result: " . ($sourceTest['success'] ? 'SUCCESS' : 'FAILED') . "\n";
+    
+    if (!$sourceTest['success']) {
+        ob_clean();
+        echo json_encode([
+            'success' => false,
+            'message' => "❌ Source connection failed: " . $sourceTest['message']
+        ]);
+        exit;
+    }
+    
+    // Test destination connection  
+    echo "DEBUG: Testing dest connection...\n";
+    $destTest = $connector->testConnection($destConfig);
+    echo "DEBUG: Dest test result: " . ($destTest['success'] ? 'SUCCESS' : 'FAILED') . "\n";
+    
+    if (!$destTest['success']) {
+        ob_clean();
+        echo json_encode([
+            'success' => false,
+            'message' => "❌ Destination connection failed: " . $destTest['message']
+        ]);
+        exit;
+    }
+    
+    // Establish persistent connections  
+    echo "DEBUG: Establishing source connection...\n";
+    $sourceConnected = $connector->connectSource($sourceConfig);
+    echo "DEBUG: Source connected: " . ($sourceConnected ? 'YES' : 'NO') . "\n";
+    
+    if (!$sourceConnected) {
+        ob_clean();
+        echo json_encode([
+            'success' => false,
+            'message' => "❌ Failed to establish source connection"
+        ]);
+        exit;
+    }
+    
+    echo "DEBUG: Establishing dest connection...\n";
+    $destConnected = $connector->connectDestination($destConfig);
+    echo "DEBUG: Dest connected: " . ($destConnected ? 'YES' : 'NO') . "\n";
+    
+    if (!$destConnected) {
+        ob_clean();
+        echo json_encode([
+            'success' => false,
+            'message' => "❌ Failed to establish destination connection"
+        ]);
+        exit;
+    }
+    
+    // Get mailboxes
+    echo "DEBUG: Getting source mailboxes...\n";
+    $sourceMailboxes = $connector->getSourceMailboxes();
+    echo "DEBUG: Found " . count($sourceMailboxes) . " mailboxes\n";
+    
+    if (count($sourceMailboxes) === 0) {
+        ob_clean();
+        echo json_encode([
+            'success' => false,
+            'message' => "❌ No mailboxes found in source"
+        ]);
+        exit;
+    }
+    
+    // Try migration with FIRST mailbox only and VERY small limit
+    echo "DEBUG: Starting migration test...\n";
+    $firstMailbox = $sourceMailboxes[0];
+    echo "DEBUG: Migrating mailbox: " . $firstMailbox['name'] . " (" . $firstMailbox['count'] . " messages)\n";
+    
+    // THIS IS PROBABLY WHERE IT FAILS - let's see
+    echo "DEBUG: About to call migrateMailbox()...\n";
+    $migrationResult = $connector->migrateMailbox($firstMailbox['name'], $firstMailbox['name'], 1, false);
+    echo "DEBUG: migrateMailbox() completed\n";
+    
+    // Close connections
+    echo "DEBUG: Closing connections...\n";
+    $connector->closeConnections();
+    echo "DEBUG: Connections closed\n";
+    
+    // Return success
     ob_clean();
     echo json_encode([
         'success' => true,
-        'message' => '✅ migrate_debug.php executed successfully!\nAll dependencies loaded correctly.\nReady to test actual migration.',
+        'message' => '✅ Full migration test completed successfully!\n' . 
+                    'Migration result: ' . ($migrationResult['success'] ? 'SUCCESS' : 'FAILED') . '\n' .
+                    'Details: ' . $migrationResult['message'],
         'debug_info' => [
-            'source_config' => $sourceConfig,
-            'dest_config' => $destConfig,
-            'options' => $options
+            'mailboxes_found' => count($sourceMailboxes),
+            'migration_result' => $migrationResult
         ]
     ]);
     
